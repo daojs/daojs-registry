@@ -1,0 +1,41 @@
+<svg width="320" height="320" xmlns="http://www.w3.org/2000/svg">
+  <path d="
+    M 251.35528725660043 28.644712743399552
+    A 160 160, 0, 0, 0, 68.64471274339957 291.35528725660043
+    L 180 180
+    L 140 140
+    Z
+  " fill="black"/>
+  <path d="
+    M 120 200
+    L 80 240
+    L 40 200
+    L 80 160
+    Z
+  " fill="white"/>
+  <path d="
+    M 200 120
+    L 240 80
+    L 280 120 
+    L 240 160
+    Z
+  " fill="black"/>
+  <!--
+    // How to calculate the ARC
+    const R = 160;
+    const r = 20;
+    const sinA = r * Math.sqrt(2) / R;
+    const cosA = Math.sqrt(1 - sinA * sinA);
+    const sinB = (sinA + cosA) / Math.sqrt(2);
+    const cosB = (cosA - sinA) / Math.sqrt(2);
+    const pos1 = {
+      x: R * (1 + cosB),
+      y: R * (1 - sinB),
+    };
+    const pos2 = {
+      x: 2 * R - pos1.x,
+      y: 2 * R - pos1.y,
+    };
+    console.log(pos1, pos2);
+  -->
+</svg>
