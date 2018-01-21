@@ -1,0 +1,9 @@
+{
+  "name": "@daojs/daojs",
+  "version": "0.0.1",
+  "description": "DaoJS",
+  "main": "src/index.js",
+  "repository": "https://github.com/daojs/daojs",
+  "author": "Wei Wei <shazhouke@gmail.com>",
+  "license": "MIT"
+}
