@@ -13,7 +13,9 @@ function generateImport(descriptor, component) {
   const { variable } = descriptor;
 
   if (_.isString(variable)) {
-    return generateImport({ default: variable }, component);
+    return generateImport({
+      variable: { default: variable },
+    }, component);
   }
 
   if (_.isObject(variable)) {
@@ -32,7 +34,7 @@ function generateImport(descriptor, component) {
 
 
 function preprocess({ source, dependencies }) {
-  const imports = _.map(dependencies, generateImport);
+  const imports = _.compact(_.map(dependencies, generateImport));
   return imports.concat(source).join('\n');
 }
 
