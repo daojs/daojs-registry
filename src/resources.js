@@ -59,8 +59,41 @@ module.exports = function resources({ storage, loaders = {} }) {
         source,
         metadata,
       } = req.body;
-      storage
-        .set({ component, source, metadata })
+      const { dependencies } = metadata;
+      const invalidDeps = [];
+
+      Promise.resolve(dependencies)
+        .then(_.toPairs)
+        .map(([comp, descriptor]) => {
+          const version = _.isNumber(descriptor) ? descriptor : descriptor.version;
+          const target = { component: comp, version };
+
+          if (comp === component) {
+            invalidDeps.push(target);
+            return null;
+          }
+
+          if (parseInt(version, 10) !== version) {
+            invalidDeps.push(target);
+            return null;
+          }
+          return storage
+            .getMetadata(target)
+            .catch(() => {
+              invalidDeps.push(target);
+            });
+        })
+        .all()
+        .then(() => {
+          if (!_.isEmpty(invalidDeps)) {
+            error(400, `Invalid dependencies ${
+              invalidDeps
+                .map(({ component: c, version: v }) => `${c}@${v}`)
+                .join(', ')
+            }`);
+          }
+        })
+        .then(() => storage.set({ component, source, metadata }))
         .then(version => res.send({ version }))
         .catch(handleError)
         .catch(reportError(res));

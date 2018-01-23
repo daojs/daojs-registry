@@ -1,7 +1,6 @@
 const Promise = require('bluebird');
 const path = require('path');
 const fs = require('fs-extra');
-const { error } = require('../error');
 
 class FSStorage {
   constructor({ root }) {
@@ -65,7 +64,7 @@ class FSStorage {
     const pathComponent = path.join(this.root, component);
 
     return Promise.props({
-      latest: fs.readFile(path.join(pathComponent, '.v', 'latest'), 'utf8'),
+      version: fs.readFile(path.join(pathComponent, '.v', 'latest'), 'utf8'),
       children: fs
         .readdir(pathComponent)
         .then(names => names.filter(name => name[0] !== '.')),
