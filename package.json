@@ -18,6 +18,8 @@
     "express": "^4.16.2",
     "forever": "^0.15.3",
     "fs-extra": "^5.0.0",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5"
   }
 }
