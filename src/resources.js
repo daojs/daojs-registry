@@ -66,7 +66,7 @@ module.exports = function resources({ storage, loaders = {} }) {
         .then(_.toPairs)
         .map(([comp, descriptor]) => {
           const version = _.isNumber(descriptor) ? descriptor : descriptor.version;
-          const target = { component: comp, version };
+          const target = { component: comp.replace(/^\//, ''), version };
 
           if (comp === component) {
             invalidDeps.push(target);
@@ -78,7 +78,12 @@ module.exports = function resources({ storage, loaders = {} }) {
             return null;
           }
           return storage
-            .getMetadata(target)
+            .getInfo({ component })
+            .then(({ version: latest }) => {
+              if (version > latest) {
+                invalidDeps.push(target);
+              }
+            })
             .catch(() => {
               invalidDeps.push(target);
             });

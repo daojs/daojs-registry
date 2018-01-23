@@ -26,7 +26,11 @@ function parseResourcePath(path) {
     error(400, `Invalid file '${file}'`);
   }
 
-  return { component, version, file };
+  return {
+    component: component.replace(/^\//, ''),
+    version,
+    file,
+  };
 }
 
 module.exports = {
