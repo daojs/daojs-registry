@@ -6,6 +6,9 @@
   "repository": "https://github.com/daojs/daojs",
   "author": "Wei Wei <shazhouke@gmail.com>",
   "license": "MIT",
+  "bin": {
+    "daojs-server": "./bin/daojs-server.js"
+  },
   "dependencies": {
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
@@ -20,6 +23,7 @@
     "fs-extra": "^5.0.0",
     "lodash": "^4.17.4",
     "request": "^2.83.0",
-    "request-promise-native": "^1.0.5"
+    "request-promise-native": "^1.0.5",
+    "yargs": "^10.1.1"
   }
 }
