@@ -8,14 +8,23 @@ class FSStorage {
     this.locks = {};
   }
 
+  loadFile({ component, version, file }) {
+    const pathV = path.join(this.root, component, '.v');
+    return Promise
+      .resolve(version === 'latest' ? fs.readFile(path.join(pathV, 'latest'), 'utf8') : version)
+      .then(v => parseInt(v, 10).toString())
+      .then(v => fs.readFile(path.join(pathV, v, file), 'utf8'));
+  }
+
   getMetadata({ component, version }) {
-    const file = path.join(this.root, component, '.v', version, 'metadata.json');
-    return Promise.resolve(fs.readJson(file));
+    return this
+      .loadFile({ component, version, file: 'metadata.json' })
+      .then(JSON.parse);
   }
 
   getSource({ component, version }) {
-    const file = path.join(this.root, component, '.v', version, 'source');
-    return Promise.resolve(fs.readFile(file, 'utf8'));
+    return this
+      .loadFile({ component, version, file: 'source' });
   }
 
   set({ component, metadata, source }) {

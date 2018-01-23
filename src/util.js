@@ -1,5 +1,5 @@
 const regexComponent = /^(\/[_0-9a-z-][._0-9a-z-]*)+$/;
-const regexVersion = /^(0|[1-9][0-9]*)$/;
+const regexVersion = /^(0|[1-9][0-9]*|latest)$/;
 const regexFile = /^index\.js$/;
 
 function parseResourcePath(path) {
