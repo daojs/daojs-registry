@@ -1,6 +1,33 @@
 const Promise = require('bluebird');
 const path = require('path');
 const fs = require('fs-extra');
+const _ = require('lodash');
+
+function getComponentVersion({ component, root }) {
+  const pathComponent = path.join(root, component);
+  const lastVersionPath = path.join(pathComponent, '.v', 'latest');
+  return fs.existsSync(lastVersionPath) ? fs.readFile(lastVersionPath, 'utf8') : undefined;
+}
+
+function getChildren({ component, root }) {
+  const pathComponent = path.join(root, component);
+  const ret = [];
+
+  return fs
+    .readdir(pathComponent)
+    .then(names => names.filter(name => !name.startsWith('.')))
+    .then(names => names.map(name => `${component}/${name}`))
+    .then(subComponents => Promise.map(subComponents, (subComponent) => {
+      if (getComponentVersion({ component: subComponent, root })) {
+        ret.push(subComponent);
+      }
+      return getChildren({
+        component: subComponent,
+        root,
+      });
+    }))
+    .then(childrens => _.flattenDeep([ret, childrens]));
+}
 
 class FSStorage {
   constructor({ root }) {
@@ -61,13 +88,9 @@ class FSStorage {
   }
 
   getInfo({ component }) {
-    const pathComponent = path.join(this.root, component);
-
     return Promise.props({
-      version: fs.readFile(path.join(pathComponent, '.v', 'latest'), 'utf8'),
-      children: fs
-        .readdir(pathComponent)
-        .then(names => names.filter(name => name[0] !== '.')),
+      version: getComponentVersion({ component, root: this.root }),
+      children: getChildren({ component, root: this.root }),
     });
   }
 }
