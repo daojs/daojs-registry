@@ -3,14 +3,15 @@ const bodyParser = require('body-parser');
 
 const resources = require('./resources');
 const api = require('./api');
-const { FSStorage } = require('./storage');
+const storages = require('./storages');
+const loaders = require('./loaders');
 
-function daojs({ storage }) {
+function daojs(options) {
   return express
     .Router()
     .use(bodyParser.json())
-    .use('/resources', resources({ storage }))
-    .use('/api', api({ storage }));
+    .use('/resources', resources(options))
+    .use('/api', api(options));
 }
 
-module.exports = { daojs, FSStorage };
+module.exports = { daojs, storages, loaders };

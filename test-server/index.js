@@ -1,6 +1,10 @@
 const express = require('express');
 const path = require('path');
-const { daojs, FSStorage } = require('..');
+const {
+  daojs,
+  storages: { FSStorage },
+  loaders: { babelLoader },
+} = require('..');
 
 const app = express();
 
@@ -9,6 +13,9 @@ app
     storage: new FSStorage({
       root: path.join(process.env.HOME, '.daojs'),
     }),
+    loaders: {
+      babel: babelLoader(),
+    },
   }))
   .get('/foo', (req, res) => {
     res.send('foo');
