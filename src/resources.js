@@ -2,6 +2,14 @@ const _ = require('lodash');
 const Promise = require('bluebird');
 const express = require('express');
 const { parseResourcePath } = require('./util');
+const { error, reportError } = require('./error');
+
+function handleError(err) {
+  if (err.code === 'ENOENT') {
+    error(404, 'Component or version does not exist');
+  }
+  throw err;
+}
 
 module.exports = function resources({ storage, loaders = {} }) {
   return express
@@ -28,15 +36,21 @@ module.exports = function resources({ storage, loaders = {} }) {
               query: req.query,
             });
           })
-          .then(source => res.send(source));
+          .then(source => res.send(source))
+          .catch(handleError)
+          .catch(reportError(res));
       } else if (version) {
         storage
           .getMetadata({ component, version })
-          .then(metadata => res.send(metadata));
+          .then(metadata => res.send(metadata))
+          .catch(handleError)
+          .catch(reportError(res));
       } else {
         storage
           .getInfo({ component })
-          .then(info => res.send(info));
+          .then(info => res.send(info))
+          .catch(handleError)
+          .catch(reportError(res));
       }
     })
     .post('/*', (req, res) => {
@@ -47,6 +61,8 @@ module.exports = function resources({ storage, loaders = {} }) {
       } = req.body;
       storage
         .set({ component, source, metadata })
-        .then(version => res.send({ version }));
+        .then(version => res.send({ version }))
+        .catch(handleError)
+        .catch(reportError(res));
     });
 };

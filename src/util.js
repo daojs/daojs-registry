@@ -1,3 +1,5 @@
+const { error } = require('./error');
+
 const regexComponent = /^(\/[_0-9a-z-][._0-9a-z-]*)+$/;
 const regexVersion = /^(0|[1-9][0-9]*|latest)$/;
 const regexFile = /^index\.js$/;
@@ -13,15 +15,15 @@ function parseResourcePath(path) {
   ] = rest === null ? [] : rest.split('/');
 
   if (!component.match(regexComponent)) {
-    throw new Error(`Invalid compoent '${component}'`);
+    error(400, `Invalid compoent '${component}'`);
   }
 
   if (!(version === null || version.match(regexVersion))) {
-    throw new Error(`Invalid version '${version}'`);
+    error(400, `Invalid version '${version}'`);
   }
 
   if (!(file === null || file.match(regexFile))) {
-    throw new Error(`Invalid file '${file}'`);
+    error(400, `Invalid file '${file}'`);
   }
 
   return { component, version, file };

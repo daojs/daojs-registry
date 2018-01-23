@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const path = require('path');
 const fs = require('fs-extra');
+const { error } = require('../error');
 
 class FSStorage {
   constructor({ root }) {
