@@ -3,8 +3,8 @@ const express = require('express');
 const path = require('path');
 const {
   daojs,
-  storages: { FSStorage },
-  loaders: { babelLoader, cdnLoader },
+  storages: { fsStorage },
+  loaders: { babelLoader },
 } = require('..');
 
 const { argv } = require('yargs')
@@ -17,12 +17,11 @@ const { argv } = require('yargs')
 express()
   .use(argv.webbase, express.static(path.join(__dirname, argv.webfold)))
   .use(argv.daobase, daojs({
-    storage: new FSStorage({
+    storage: fsStorage({
       root: path.join(argv.storage, '.daojs'),
     }),
     loaders: {
-      babel: babelLoader(),
-      cdn: cdnLoader(),
+      es2015: babelLoader(),
     },
   }))
   .listen(argv.port);

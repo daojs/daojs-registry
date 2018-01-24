@@ -13,7 +13,8 @@ function fsStorage({ root }) {
     .bindAll('readLock', 'writeLock')
     .mapValues(func => cb => (...args) => new Promise((resolve) => {
       func(args[0], resolve);
-    }).then(release => cb(...args).finally(release)));
+    }).then(release => cb(...args).finally(release)))
+    .value();
 
   function getVersion(node) {
     return Promise
@@ -37,18 +38,21 @@ function fsStorage({ root }) {
   }
 
   function update(node, blobs) {
-    const pathV = path.join(this.root, node, '.v');
+    const pathV = path.join(root, node, '.v');
+    let version;
 
     return getVersion(node)
       .catch(_.constant(0))
       .then(ver => ver + 1)
+      .tap((ver) => { version = ver; })
       .then(ver => ver.toString())
       .tap(strVer => fs.mkdirp(path.join(pathV, strVer)))
       .tap(strVer => fs.writeFile(path.join(pathV, 'latest'), strVer))
       .then(strVer => name => path.join(pathV, strVer, name))
       .then(pathFor => (blob, name) => fs.writeFile(pathFor(name), blob))
       .then(writeBlob => _.mapValues(blobs, writeBlob))
-      .props();
+      .props()
+      .then(() => version);
   }
 
   return {

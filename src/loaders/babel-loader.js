@@ -33,28 +33,28 @@ function generateImport(descriptor, component) {
 }
 
 
-function preprocess({ source, dependencies }) {
+function preprocess({ code, dependencies }) {
   const imports = _.compact(_.map(dependencies, generateImport));
-  return imports.concat(source).join('\n');
+  return imports.concat(code).join('\n');
 }
 
-module.exports = function babelBuilder(options = {
+module.exports = function babelLoader(options = {
   ast: false,
   presets: ['env', 'react'],
   plugins: ['transform-es2015-modules-amd'],
 }) {
-  return (source, {
+  return (code, {
     component,
     version,
+    debug,
     metadata: {
       dependencies = {},
-    } = {},
-    query,
-  }) => Promise.resolve({ source, dependencies })
+    },
+  }) => Promise.resolve({ code, dependencies })
     .then(preprocess)
     .then(src => transform(src, _.defaults({
-      sourceFileName: `daojs:///${component}@${version}/source.js`,
-      sourceMaps: _.has(query, 'debug') ? 'inline' : false,
+      sourceFileName: `daojs:///${component}@${version}/code.js`,
+      sourceMaps: debug ? 'inline' : false,
     }, options)))
     .then(_.property('code'));
 };
