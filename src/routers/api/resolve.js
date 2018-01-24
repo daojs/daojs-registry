@@ -2,9 +2,9 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const { error, reportError } = require('../error');
 
-module.exports = function resolve({ storage }) {
+module.exports = function resolve({ registry }) {
   return (req, res) => {
-    const { entry, versions: lock = {} } = req.body;
+    const { entry, versions: locked = {} } = req.body;
     const versions = {};
     const conflicts = [];
 
@@ -14,9 +14,9 @@ module.exports = function resolve({ storage }) {
       }
 
       return Promise
-        .resolve(lock[component] || storage.getInfo({ component }).get('version'))
+        .resolve(locked[component] || registry.getVersion(component))
         .tap((version) => { versions[component] = version; })
-        .then(version => storage.getMetadata({ component, version }))
+        .then(version => registry.getMetadata(component, version))
         .get('dependencies')
         .then(_.toPairs)
         .map(([comp, descriptor]) => {
@@ -31,12 +31,12 @@ module.exports = function resolve({ storage }) {
             }`);
           }
 
-          if (_.has(lock, comp) && lock[comp] < v) {
+          if (_.has(locked, comp) && locked[comp] < v) {
             conflicts.push({
               from: component,
               to: comp,
               expected: v,
-              actual: lock[comp],
+              actual: locked[comp],
             });
           }
 
