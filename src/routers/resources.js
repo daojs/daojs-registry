@@ -30,7 +30,9 @@ module.exports = function resources({ registry, loaders = {} }) {
 
       registry
         .getSource(component, version, debug)
-        .then(source => res.jsonp(source));
+        .then(source => res.jsonp(source))
+        .catch(handleError)
+        .catch(reportError(res));
     })
 
     // Get generated script
@@ -50,7 +52,9 @@ module.exports = function resources({ registry, loaders = {} }) {
           debug,
           metadata,
         }))
-        .then(script => res.send(script));
+        .then(script => res.send(script))
+        .catch(handleError)
+        .catch(reportError(res));
     })
     // Get README.md
     .get(new RegExp(`^/${regexV}/README.md$`), (req, res) => {
@@ -59,7 +63,9 @@ module.exports = function resources({ registry, loaders = {} }) {
 
       registry
         .getReadme(component, version)
-        .then(readme => res.send(readme));
+        .then(readme => res.send(readme))
+        .catch(handleError)
+        .catch(reportError(res));
     })
 
     // Get metadata json
@@ -68,7 +74,9 @@ module.exports = function resources({ registry, loaders = {} }) {
       const version = parseVersion(req.params[1]);
       registry
         .getMetadata(component, version)
-        .then(metadata => res.jsonp(metadata));
+        .then(metadata => res.jsonp(metadata))
+        .catch(handleError)
+        .catch(reportError(res));
     })
 
     // Get child components
@@ -76,7 +84,9 @@ module.exports = function resources({ registry, loaders = {} }) {
       const component = req.params[0];
       registry
         .getChildren(component)
-        .then(children => res.send(children));
+        .then(children => res.send(children))
+        .catch(handleError)
+        .catch(reportError(res));
     })
 
     // Get component metadata
@@ -84,16 +94,20 @@ module.exports = function resources({ registry, loaders = {} }) {
       const component = req.params[0];
       registry
         .getVersion(component)
-        .then(version => res.send({ version }));
+        .then(version => res.send({ version }))
+        .catch(handleError)
+        .catch(reportError(res));
     })
 
     // Publish new component/version
     .post(new RegExp(`^/${regexC}$`), (req, res) => {
       const component = req.params[0];
 
-      Promise
-        .resolve(validateComponent(req.body))
+      Promise.resolve(req.body)
+        .then(validateComponent)
         .then(payload => registry.updateComponent(component, payload))
-        .then(version => res.send({ version }));
+        .then(version => res.send({ version }))
+        .catch(handleError)
+        .catch(reportError(res));
     });
 };
