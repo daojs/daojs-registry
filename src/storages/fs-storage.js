@@ -13,19 +13,18 @@ function getChildren({ component, root }) {
   const pathComponent = path.join(root, component);
   const ret = [];
 
+  if (getComponentVersion({ component, root })) {
+    ret.push(component);
+  }
+
   return fs
     .readdir(pathComponent)
     .then(names => names.filter(name => !name.startsWith('.')))
     .then(names => names.map(name => `${component}/${name}`))
-    .then(subComponents => Promise.map(subComponents, (subComponent) => {
-      if (getComponentVersion({ component: subComponent, root })) {
-        ret.push(subComponent);
-      }
-      return getChildren({
-        component: subComponent,
-        root,
-      });
-    }))
+    .then(subComponents => Promise.map(subComponents, subComponent => getChildren({
+      component: subComponent,
+      root,
+    })))
     .then(childrens => _.flattenDeep([ret, childrens]));
 }
 
@@ -90,7 +89,8 @@ class FSStorage {
   getInfo({ component }) {
     return Promise.props({
       version: getComponentVersion({ component, root: this.root }),
-      children: getChildren({ component, root: this.root }),
+      children: getChildren({ component, root: this.root }).then(children =>
+        _.without(children, [component])),
     });
   }
 }
