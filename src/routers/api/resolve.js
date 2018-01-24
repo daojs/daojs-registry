@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const _ = require('lodash');
-const { error, reportError } = require('../error');
+const { error, reportError } = require('../../error');
 
 module.exports = function resolve({ registry }) {
   return (req, res) => {

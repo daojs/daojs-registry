@@ -3,6 +3,14 @@ const path = require('path');
 const fs = require('fs-extra');
 const _ = require('lodash');
 const ReadWriteLock = require('rwlock');
+const { error } = require('../error');
+
+function handleError(err) {
+  if (err.code === 'ENOENT') {
+    error(404, 'Component or version does not exist');
+  }
+  throw err;
+}
 
 function fsStorage({ root }) {
   const lock = new ReadWriteLock();
@@ -19,13 +27,15 @@ function fsStorage({ root }) {
   function getVersion(node) {
     return Promise
       .resolve(fs.readFile(path.join(root, node, '.v', 'latest')))
-      .then(version => parseInt(version, 10));
+      .then(version => parseInt(version, 10))
+      .catch(handleError);
   }
 
   function getChildren(node) {
     return Promise
       .resolve(fs.readdir(path.join(root, node)))
-      .filter(name => !name.startsWith('.'));
+      .filter(name => !name.startsWith('.'))
+      .catch(handleError);
   }
 
   function getBlob(node, name, version = 0) {
@@ -34,7 +44,8 @@ function fsStorage({ root }) {
       .then(base => base + version)
       .then(ver => ver.toString())
       .then(strVer => path.join(root, node, '.v', strVer, name))
-      .then(filePath => fs.readFile(filePath, 'utf8'));
+      .then(filePath => fs.readFile(filePath, 'utf8'))
+      .catch(handleError);
   }
 
   function update(node, blobs) {
@@ -52,7 +63,8 @@ function fsStorage({ root }) {
       .then(pathFor => (blob, name) => fs.writeFile(pathFor(name), blob))
       .then(writeBlob => _.mapValues(blobs, writeBlob))
       .props()
-      .then(() => version);
+      .then(() => version)
+      .catch(handleError);
   }
 
   return {

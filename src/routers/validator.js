@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
-const { error } = require('./error');
+const { error } = require('../error');
 
 function validator({ registry, loaders }) {
   function validateDescription(description) {

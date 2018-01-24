@@ -6,15 +6,8 @@ const {
   regexVersion,
   parseVersion,
 } = require('./url-utility');
-const { error, reportError } = require('./error');
+const { reportError } = require('../error');
 const validator = require('./validator');
-
-function handleError(err) {
-  if (err.code === 'ENOENT') {
-    error(404, 'Component or version does not exist');
-  }
-  throw err;
-}
 
 module.exports = function resources({ registry, loaders = {} }) {
   const regexC = `(${regexComponentName})`;
@@ -31,7 +24,6 @@ module.exports = function resources({ registry, loaders = {} }) {
       registry
         .getSource(component, version, debug)
         .then(source => res.jsonp(source))
-        .catch(handleError)
         .catch(reportError(res));
     })
 
@@ -53,7 +45,6 @@ module.exports = function resources({ registry, loaders = {} }) {
           metadata,
         }))
         .then(script => res.send(script))
-        .catch(handleError)
         .catch(reportError(res));
     })
     // Get README.md
@@ -64,7 +55,6 @@ module.exports = function resources({ registry, loaders = {} }) {
       registry
         .getReadme(component, version)
         .then(readme => res.send(readme))
-        .catch(handleError)
         .catch(reportError(res));
     })
 
@@ -75,7 +65,6 @@ module.exports = function resources({ registry, loaders = {} }) {
       registry
         .getMetadata(component, version)
         .then(metadata => res.jsonp(metadata))
-        .catch(handleError)
         .catch(reportError(res));
     })
 
@@ -85,7 +74,6 @@ module.exports = function resources({ registry, loaders = {} }) {
       registry
         .getChildren(component)
         .then(children => res.send(children))
-        .catch(handleError)
         .catch(reportError(res));
     })
 
@@ -95,7 +83,6 @@ module.exports = function resources({ registry, loaders = {} }) {
       registry
         .getVersion(component)
         .then(version => res.send({ version }))
-        .catch(handleError)
         .catch(reportError(res));
     })
 
@@ -107,7 +94,6 @@ module.exports = function resources({ registry, loaders = {} }) {
         .then(validateComponent)
         .then(payload => registry.updateComponent(component, payload))
         .then(version => res.send({ version }))
-        .catch(handleError)
         .catch(reportError(res));
     });
 };
