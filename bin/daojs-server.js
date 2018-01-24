@@ -10,10 +10,13 @@ const {
 const { argv } = require('yargs')
   .option('port', { alias: 'p', default: 3000 })
   .option('storage', { alias: 's', default: process.env.HOME || process.env.HOMEPATH })
-  .option('base', { alias: 'b', default: '/' });
+  .option('daobase', { alias: 'b', default: '/' })
+  .option('webbase', { alias: 'w', default: '/public' })
+  .option('webfold', { alias: 'wf', default: 'public' });
 
 express()
-  .use(argv.base, daojs({
+  .use(argv.webbase, express.static(path.join(__dirname, argv.webfold)))
+  .use(argv.daobase, daojs({
     storage: new FSStorage({
       root: path.join(argv.storage, '.daojs'),
     }),
