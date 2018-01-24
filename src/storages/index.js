@@ -1,3 +1,3 @@
-const FSStorage = require('./fs-storage');
+const fsStorage = require('./fs-storage');
 
-module.exports = { FSStorage };
+module.exports = { fsStorage };
