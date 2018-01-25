@@ -5,7 +5,7 @@ const _ = require('lodash');
 const {
   daojs,
   storages: { fsStorage, romStorage, waterfallStorage },
-  loaders: { babelLoader },
+  loaders: { babelLoader, jsonLoader },
   urlUtility,
 } = require('..');
 
@@ -41,6 +41,7 @@ express()
     }),
     loaders: {
       js: _.identity,
+      json: jsonLoader(),
       es2015: babelLoader(),
     },
   }))
