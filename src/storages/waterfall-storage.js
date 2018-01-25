@@ -33,7 +33,7 @@ function waterfallStorage({ storages = [] }) {
   return {
     getVersion: node => findStorage(node).getVersion(node),
     getChildren: node => findStorage(node).getChildren(node),
-    getBlob: (node, name) => findStorage(node).getBlob(node, name),
+    getBlob: (node, name, version) => findStorage(node).getBlob(node, name, version),
     update: (node, blobs) => findStorage(node).update(node, blobs),
   };
 }
