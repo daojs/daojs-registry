@@ -47,6 +47,7 @@ module.exports = function resources({ registry, loaders = {} }) {
         .then(script => res.send(script))
         .catch(reportError(res));
     })
+
     // Get README.md
     .get(new RegExp(`^/${regexV}/README.md$`), (req, res) => {
       const component = req.params[0];

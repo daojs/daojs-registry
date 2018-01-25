@@ -12,9 +12,9 @@ function registry(storage) {
   function getSource(component, version = 0, debug = false) {
     return getMetadata(component, version)
       .then(({ source, sourceDebug }) => (debug && sourceDebug) || source)
-      .then(({ isUrl, name }) => ({
+      .then(({ isUrl, name, url }) => ({
         isUrl,
-        data: isUrl ? name : storage.getBlob(component, name, version),
+        data: isUrl ? url : storage.getBlob(component, name, version),
       }))
       .props();
   }
@@ -23,7 +23,7 @@ function registry(storage) {
     return getMetadata(component, version)
       .then(metadata => ({
         metadata,
-        name: debug && metadata.sourceDebug ? 'source.debug' : 'source',
+        name: ((debug && metadata.sourceDebug) || metadata.source).name,
       }))
       .then(({ metadata, name }) => ({
         metadata,
@@ -55,7 +55,10 @@ function registry(storage) {
     }, (name, key) => {
       if (files[key]) {
         const { isUrl, data } = files[key];
-        metadata[key] = { isUrl, name: isUrl ? data : name };
+        metadata[key] = { isUrl, name };
+        if (isUrl) {
+          metadata[key].url = data;
+        }
         blobs[name] = isUrl ? rp.get(data) : data;
       }
     });

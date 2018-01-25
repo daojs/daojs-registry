@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 const express = require('express');
 const path = require('path');
+const _ = require('lodash');
 const {
   daojs,
-  storages: { fsStorage },
+  storages: { fsStorage, romStorage, waterfallStorage },
   loaders: { babelLoader },
+  urlUtility,
 } = require('..');
+
+const view = require('./routers/view');
 
 const { argv } = require('yargs')
   .option('port', { alias: 'p', default: 3000 })
@@ -15,12 +19,28 @@ const { argv } = require('yargs')
   .option('webfold', { alias: 'wf', default: 'public' });
 
 express()
+  .set('view engine', 'pug')
+  .set('views', path.join(__dirname, 'views'))
+  .use('/view', view({
+    urlUtility,
+    resources: argv.daobase.replace(/\/?$/, '/resources'),
+  }))
   .use(argv.webbase, express.static(path.join(__dirname, argv.webfold)))
   .use(argv.daobase, daojs({
-    storage: fsStorage({
-      root: path.join(argv.storage, '.daojs'),
+    storage: waterfallStorage({
+      storages: [{
+        condition: '@',
+        storage: romStorage({
+          root: path.resolve(__dirname, '../rom'),
+        }),
+      }, {
+        storage: fsStorage({
+          root: path.join(argv.storage, '.daojs'),
+        }),
+      }],
     }),
     loaders: {
+      js: _.identity,
       es2015: babelLoader(),
     },
   }))
