@@ -8,7 +8,7 @@ function validator({ registry, loaders }) {
   }
 
   function validateDep(descriptor, component) {
-    const version = _.isNumber(descriptor) ? descriptor : descriptor.verison;
+    const version = _.isNumber(descriptor) ? descriptor : descriptor.version || 0;
 
     if (parseInt(version, 10) !== version || version < 0) {
       error(400, 'Invalid dependenecy version');

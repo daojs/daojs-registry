@@ -44,7 +44,7 @@ module.exports = function resources({ registry, loaders = {} }) {
           debug,
           metadata,
         }))
-        .then(script => res.send(script))
+        .then(data => (_.isString(data) ? res.send(data) : res.jsonp(data)))
         .catch(reportError(res));
     })
 

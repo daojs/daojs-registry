@@ -23,7 +23,7 @@ express()
   .set('views', path.join(__dirname, 'views'))
   .use('/view', view({
     urlUtility,
-    resources: argv.daobase.replace(/\/?$/, '/resources'),
+    daobase: argv.daobase,
   }))
   .use(argv.webbase, express.static(path.join(__dirname, argv.webfold)))
   .use(argv.daobase, daojs({
