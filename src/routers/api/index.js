@@ -4,5 +4,5 @@ const resolve = require('./resolve');
 module.exports = function api(options) {
   return express
     .Router()
-    .post('/resolve', resolve(options));
+    .use('/resolve', resolve(options));
 };

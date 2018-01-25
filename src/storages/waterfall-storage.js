@@ -3,6 +3,9 @@ const { error } = require('../error');
 
 function waterfallStorage({ storages = [] }) {
   function hits(condition, node) {
+    if (_.isUndefined(condition)) {
+      return true;
+    }
     if (_.isString(condition)) {
       return node.startsWith(condition.replace(/\/?$/, '/'));
     }
