@@ -68,21 +68,15 @@ module.exports = function resources({ registry, loaders = {} }) {
         .catch(reportError(res));
     })
 
-    // Get child components
-    .get(new RegExp(`^/${regexC}/$`), (req, res) => {
-      const component = req.params[0];
-      registry
-        .getChildren(component)
-        .then(children => res.send(children))
-        .catch(reportError(res));
-    })
+    // Get component information
+    .get(new RegExp(`^/(${regexC}/?)?$`), (req, res) => {
+      const component = req.params[0] || '';
 
-    // Get component metadata
-    .get(new RegExp(`^/${regexC}$`), (req, res) => {
-      const component = req.params[0];
-      registry
-        .getVersion(component)
-        .then(version => res.send({ version }))
+      Promise.props({
+        version: registry.getVersion(component).catch(() => undefined),
+        children: registry.getChildren(component),
+      })
+        .then(info => res.jsonp(info))
         .catch(reportError(res));
     })
 
