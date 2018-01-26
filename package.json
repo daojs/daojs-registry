@@ -7,9 +7,11 @@
   "author": "Wei Wei <shazhouke@gmail.com>",
   "license": "MIT",
   "bin": {
-    "daojs-server": "./bin/daojs-server.js"
+    "daojs-server": "./bin/daojs-server.js",
+    "daojs-upload": "./bin/daojs-upload.js"
   },
   "dependencies": {
+    "axios": "^0.17.1",
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
