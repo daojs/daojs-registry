@@ -1,8 +1,10 @@
+#!/usr/bin/env node
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const axios = require('axios');
 const esprima = require('esprima');
 const _ = require('lodash');
+const chalk = require('chalk');
 
 const { argv } = require('yargs')
   .option('metadata', { alias: 'm', default: 'daopkg.json' })
@@ -13,7 +15,7 @@ const { argv } = require('yargs')
 const url = 'http://daojs.koreasouth.cloudapp.azure.com/resources/';
 
 Promise.map([argv.metadata, argv.source, argv.sourceDebug, argv.readme], path =>
-  fs.readFileAsync(path))
+  fs.readFileAsync(path, 'utf8'))
   .then((files) => {
     const {
       name,
@@ -24,13 +26,13 @@ Promise.map([argv.metadata, argv.source, argv.sourceDebug, argv.readme], path =>
 
     return axios.post(`${url}${name}`, {
       source: {
-        data: files[0],
-      },
-      sourceDebug: {
         data: files[1],
       },
-      readme: {
+      sourceDebug: {
         data: files[2],
+      },
+      readme: {
+        data: files[3],
       },
       type,
       description,
@@ -57,8 +59,8 @@ Promise.map([argv.metadata, argv.source, argv.sourceDebug, argv.readme], path =>
     });
   })
   .then((response) => {
-    console.log(response);
+    console.log(chalk.green('SUCCES'), 'version =', response.data.version);
   })
   .catch((error) => {
-    console.log(error);
+    console.log(chalk.red('FAILED'), error);
   });
