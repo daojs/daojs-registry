@@ -1,43 +1,6 @@
 const _ = require('lodash');
 const { transform } = require('babel-core');
 
-function generateNameList(namedExports) {
-  if (_.isEmpty(namedExports)) {
-    return null;
-  }
-  const list = _.toPairs(namedExports).map(p => p.join(' as '));
-  return `{ ${list.join(', ')} }`;
-}
-
-function generateImport(descriptor, component) {
-  const { variable } = descriptor;
-
-  if (_.isString(variable)) {
-    return generateImport({
-      variable: { default: variable },
-    }, component);
-  }
-
-  if (_.isObject(variable)) {
-    const { default: defaultExport } = variable;
-    const otherExports = _.omit(variable, 'default');
-    const variableStr = _.compact([
-      _.isString(defaultExport) && defaultExport,
-      generateNameList(otherExports),
-    ]).join(', ');
-
-    return `import ${variableStr} from '${component}';`;
-  }
-
-  return null;
-}
-
-
-function preprocess({ code, dependencies }) {
-  const imports = _.compact(_.map(dependencies, generateImport));
-  return imports.concat(code).join('\n');
-}
-
 module.exports = function babelLoader(options = {
   ast: false,
   presets: ['env', 'react'],
@@ -47,10 +10,8 @@ module.exports = function babelLoader(options = {
     component,
     version,
     debug,
-    dependencies = {},
-  }) => Promise.resolve({ code, dependencies })
-    .then(preprocess)
-    .then(src => transform(src, _.defaults({
+  }) => Promise
+    .resolve(transform(code, _.defaults({
       sourceFileName: `daojs:///${component}@${version}/code.js`,
       sourceMaps: debug ? 'inline' : false,
     }, options)))
