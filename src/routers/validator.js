@@ -8,12 +8,11 @@ function validator({ registry, loaders }) {
     return _.isString(description) ? description : '';
   }
 
-  function validateDep(descriptor, component) {
+  function validateDep(version, component) {
     if (!isDaoComponent(component)) {
       // TODO Check npm package dependency
-      return descriptor;
+      return version;
     }
-    const version = _.isNumber(descriptor) ? descriptor : descriptor.version || 0;
 
     if (parseInt(version, 10) !== version || version < 0) {
       error(400, 'Invalid dependenecy version');
@@ -25,7 +24,7 @@ function validator({ registry, loaders }) {
         if (ver < version) {
           error(400, 'Dependency version does not exist');
         }
-        return descriptor;
+        return version;
       });
   }
 

@@ -2,17 +2,16 @@ const express = require('express');
 const _ = require('lodash');
 const { reportError } = require('../../error');
 const {
-  regexComponentName,
-  regexVersion,
+  regexDaoComponentName,
   parseVersion,
 } = require('../url-utility');
 
 module.exports = function resolve({ registry }) {
-  const regexV = `^/(${regexComponentName})(?:@(${regexVersion}))?$`;
+  const regexV = `^/(${regexDaoComponentName})$`;
 
   function handler(req, res, locked) {
     const component = req.params[0];
-    const version = parseVersion(req.params[1] || 'latest');
+    const version = parseVersion(req.query.v);
 
     registry
       .resolve({

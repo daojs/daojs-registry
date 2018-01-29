@@ -9,7 +9,6 @@ module.exports = function list({ registry }) {
   return express.Router()
     .get(new RegExp(`^/(${regexDaoComponentName})/?$`), (req, res) => {
       const component = req.params[0];
-      console.log(component);
 
       Promise.props({
         version: registry.getVersion(component).catch(() => undefined),

@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 const { error } = require('./error');
+const { isDaoComponent } = require('./routers/url-utility');
 
 function registry(storage) {
   function getMetadata(component, version = 0) {
@@ -52,7 +53,7 @@ function registry(storage) {
     const conflicts = [];
 
     function resolveComponent(component, chain = [component]) {
-      if (_.has(versions, component)) {
+      if (_.has(versions, component) || !isDaoComponent(component)) {
         return Promise.resolve();
       }
 

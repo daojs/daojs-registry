@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const registry = require('../registry');
-const resources = require('./resources');
 const api = require('./api');
 
 const components = require('./components');
@@ -21,7 +20,6 @@ function daojs({ storage, loaders }) {
     .use('/components', components(options))
     .use('/scripts', scripts(options))
     .use('/list', list(options))
-    .use('/resources', resources(options))
     .use('/api', api(options));
 }
 
