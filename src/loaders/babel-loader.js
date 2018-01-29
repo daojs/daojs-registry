@@ -47,9 +47,7 @@ module.exports = function babelLoader(options = {
     component,
     version,
     debug,
-    metadata: {
-      dependencies = {},
-    },
+    dependencies = {},
   }) => Promise.resolve({ code, dependencies })
     .then(preprocess)
     .then(src => transform(src, _.defaults({

@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 const { error } = require('../error');
+const { isDaoComponent } = require('./url-utility');
 
 function validator({ registry, loaders }) {
   function validateDescription(description) {
@@ -8,6 +9,10 @@ function validator({ registry, loaders }) {
   }
 
   function validateDep(descriptor, component) {
+    if (!isDaoComponent(component)) {
+      // TODO Check npm package dependency
+      return descriptor;
+    }
     const version = _.isNumber(descriptor) ? descriptor : descriptor.version || 0;
 
     if (parseInt(version, 10) !== version || version < 0) {
@@ -36,24 +41,14 @@ function validator({ registry, loaders }) {
   }
 
   function validateSource(source) {
-    if (!_.isObject(source) || !_.isString(source.data)) {
+    if (!_.isString(source)) {
       error(400, 'Invalid component source');
     }
     return source;
   }
 
-  function validateSourceDebug(sourceDebug) {
-    if (!_.isUndefined(sourceDebug) && !_.isString(sourceDebug.data)) {
-      error(400, 'Invalid component sourceDebug');
-    }
-    return sourceDebug;
-  }
-
-  function validateReadme(readme) {
-    if (_.isUndefined(readme)) {
-      return { data: '' };
-    }
-    if (!_.isObject(readme) || !_.isString(readme.data)) {
+  function validateReadme(readme = '') {
+    if (!_.isString(readme)) {
       error(400, 'Invalid component readme');
     }
     return readme;
@@ -64,7 +59,6 @@ function validator({ registry, loaders }) {
     dependencies,
     type,
     source,
-    sourceDebug,
     readme,
   }) {
     return Promise.props({
@@ -72,7 +66,6 @@ function validator({ registry, loaders }) {
       dependencies: validateDependencies(dependencies),
       type: validateType(type),
       source: validateSource(source),
-      sourceDebug: validateSourceDebug(sourceDebug),
       readme: validateReadme(readme),
     });
   }

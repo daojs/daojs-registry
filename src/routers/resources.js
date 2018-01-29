@@ -15,7 +15,6 @@ module.exports = function resources({ registry, loaders = {} }) {
   const { validateComponent } = validator({ registry, loaders });
 
   return express.Router()
-    // Get source json
     .get(new RegExp(`^/${regexV}/source(\\.debug)?\\.json$`), (req, res) => {
       const component = req.params[0];
       const version = parseVersion(req.params[1]);
@@ -24,27 +23,6 @@ module.exports = function resources({ registry, loaders = {} }) {
       registry
         .getSource(component, version, debug)
         .then(source => res.jsonp(source))
-        .catch(reportError(res));
-    })
-
-    // Get generated script
-    .get(new RegExp(`^/${regexV}/index(\\.debug)?\\.js$`), (req, res) => {
-      const component = req.params[0];
-      const version = parseVersion(req.params[1]);
-      const debug = Boolean(req.params[2]);
-
-      registry
-        .getCodeAndMetadata(component, version, debug)
-        .then(({
-          code,
-          metadata,
-        }) => (loaders[metadata.type] || _.identity)(code, {
-          component,
-          version,
-          debug,
-          metadata,
-        }))
-        .then(data => (_.isString(data) ? res.send(data) : res.jsonp(data)))
         .catch(reportError(res));
     })
 

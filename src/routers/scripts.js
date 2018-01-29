@@ -12,24 +12,24 @@ const { reportError } = require('../error');
 
 module.exports = function scripts({ registry, loaders = {} }) {
   function loadNpmScript({ component, version = 'latest', debug }) {
-    const url = `https://wzrd.in/${debug ? 'debug-' : ''}bundle/${component}@${version}`;
+    const url = `https://wzrd.in/${debug ? 'debug-' : ''}standalone/${component}@${version}`;
 
     return rp.get(url);
   }
 
   function loadDaoScript({ component, version, debug }) {
     return registry
-      .getCodeAndMetadata(component, version, debug)
-      .then(({ code, metadata }) => {
-        const { type } = metadata;
-
-        return (loaders[type] || _.identity)(code, {
-          component,
-          version,
-          debug,
-          metadata,
-        });
-      });
+      .getComponent(component, version, debug)
+      .then(({
+        source,
+        dependencies,
+        type,
+      }) => (loaders[type] || _.identity)(source, {
+        component,
+        version,
+        debug,
+        dependencies,
+      }));
   }
 
   function loadScript({ component, version, debug }) {
