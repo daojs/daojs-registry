@@ -6,6 +6,7 @@ const { error } = require('../error');
 
 function handleError(err) {
   if (err.code === 'ENOENT') {
+    console.log(err.stack);
     error(404, 'Component or version does not exist');
   }
   throw err;

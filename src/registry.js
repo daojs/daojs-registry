@@ -1,40 +1,33 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
-const rp = require('request-promise');
 const { error } = require('./error');
+const { isDaoComponent } = require('./routers/url-utility');
 
 function registry(storage) {
   function getMetadata(component, version = 0) {
     return storage
-      .getBlob(component, 'metadata.json', version)
+      .getBlob(component, 'metadata', version)
       .then(JSON.parse);
   }
 
-  function getSource(component, version = 0, debug = false) {
-    return getMetadata(component, version)
-      .then(({ source, sourceDebug }) => (debug && sourceDebug) || source)
-      .then(({ isUrl, name, url }) => ({
-        isUrl,
-        data: isUrl ? url : storage.getBlob(component, name, version),
-      }))
-      .props();
-  }
-
-  function getCodeAndMetadata(component, version = 0, debug = false) {
-    return getMetadata(component, version)
-      .then(metadata => ({
-        metadata,
-        name: ((debug && metadata.sourceDebug) || metadata.source).name,
-      }))
-      .then(({ metadata, name }) => ({
-        metadata,
-        code: storage.getBlob(component, name, version),
-      }))
-      .props();
+  function getSource(component, version = 0) {
+    return storage.getBlob(component, 'source', version);
   }
 
   function getReadme(component, version = 0) {
-    return storage.getBlob(component, 'README.md', version);
+    return storage.getBlob(component, 'readme', version);
+  }
+
+  function getComponent(component, version = 0) {
+    return Promise.all([
+      getMetadata(component, version),
+      getSource(component, version),
+      getReadme(component, version),
+    ])
+      .spread((metadata, source, readme) => _.defaults({
+        source,
+        readme,
+      }, metadata));
   }
 
   function updateComponent(component, {
@@ -42,32 +35,17 @@ function registry(storage) {
     description,
     type,
     source,
-    sourceDebug,
     readme,
   }) {
-    const metadata = { dependencies, type, description };
-    const files = { source, sourceDebug, readme };
-    const blobs = {};
-
-    _.forEach({
-      source: 'source',
-      sourceDebug: 'source.debug',
-      readme: 'README.md',
-    }, (name, key) => {
-      if (files[key]) {
-        const { isUrl, data } = files[key];
-        metadata[key] = { isUrl, name };
-        if (isUrl) {
-          metadata[key].url = data;
-        }
-        blobs[name] = isUrl ? rp.get(data) : data;
-      }
+    return storage.update(component, {
+      source,
+      readme,
+      metadata: JSON.stringify({
+        type,
+        description,
+        dependencies,
+      }),
     });
-
-    blobs['metadata.json'] = JSON.stringify(metadata);
-
-    return Promise.props(blobs)
-      .then(b => storage.update(component, b));
   }
 
   function resolve({ entry, locked }) {
@@ -75,7 +53,7 @@ function registry(storage) {
     const conflicts = [];
 
     function resolveComponent(component, chain = [component]) {
-      if (_.has(versions, component)) {
+      if (_.has(versions, component) || !isDaoComponent(component)) {
         return Promise.resolve();
       }
 
@@ -118,8 +96,8 @@ function registry(storage) {
   return _.extend({
     getMetadata,
     getSource,
-    getCodeAndMetadata,
     getReadme,
+    getComponent,
     updateComponent,
     resolve,
   }, storage);
