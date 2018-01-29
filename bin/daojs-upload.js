@@ -39,7 +39,7 @@ function upload(directory, isRoot = false) {
   let currentName;
 
   // Recursively upload all sub directories
-  const subTasks = getDirectories.map(upload);
+  const subTasks = getDirectories(directory).map(upload);
 
   // Upload current directory
   const currentTask = Promise.props(_.mapValues({
@@ -51,7 +51,16 @@ function upload(directory, isRoot = false) {
     const filePath = path.resolve(directory, fileName);
 
     log.verbose('Read', fileType, 'from', filePath, 'with encoding', encoding);
-    return fs.readFileAsync(filePath, encoding);
+    return fs.readFileAsync(filePath, encoding)
+      .catch((error) => {
+        if (fileType === 'metadata') {
+          return '{}';
+        }
+        if (fileType === 'readme') {
+          return '';
+        }
+        throw error;
+      });
   }))
     .then(({
       metadata,
@@ -105,9 +114,14 @@ function upload(directory, isRoot = false) {
       return 'failed';
     });
 
-  return Promise.reduce([...subTasks, currentTask], (result, status) => _.defaults({
-    [status]: (result[status] || 0) + 1,
-  }, result), {});
+  return Promise.props({ subTasks, currentTask })
+    .then(result => result.subTasks.concat(result.currentTask))
+    .reduce((result, status) => _.defaults({
+      [status]: (result[status] || 0) + 1,
+    }, result), {
+      success: 0,
+      failed: 0,
+    });
 }
 
 upload(argv.path, true).then((result) => {
