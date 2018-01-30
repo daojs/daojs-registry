@@ -94,12 +94,11 @@ function upload(directory, isRoot = false) {
           .filter(syntaxTreeNode => syntaxTreeNode.type === 'ImportDeclaration')
           .reduce((deps, importDeclaration) => {
             const importFrom = importDeclaration.source.value;
-            let version = dependencies[importFrom];
-            if (_.isEmpty(version)) {
-              version = importFrom.startsWith('@/') ? '0' : '*';
-            }
+            const defaultVersion = importFrom.startsWith('@/') ? '0' : '*';
             return _.defaults({
-              [importFrom]: version,
+              [importFrom]: _.has(dependencies, importFrom) ?
+                dependencies[importFrom] :
+                defaultVersion,
             }, deps);
           }, {})
           .value(),
