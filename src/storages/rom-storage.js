@@ -34,9 +34,20 @@ function romStorage({ root }) {
   }
 
   function getBlob(node, name) {
-    return Promise
-      .resolve(fs.readFile(path.join(root, node, name), 'utf8'))
-      .catch(handleError);
+    return new Promise((resolve) => {
+      const content = fs.readFileSync(path.join(root, node, 'metadata.json'), 'utf8');
+      const metadata = JSON.parse(content);
+      switch (name) {
+        case 'source':
+          resolve(fs.readFileSync(path.join(root, node, metadata.source.name), 'utf8'));
+          break;
+        case 'metadata':
+          resolve(JSON.stringify(_.omit(metadata, 'source')));
+          break;
+        default:
+          resolve('');
+      }
+    });
   }
 
   function update(/* node, blobs */) {

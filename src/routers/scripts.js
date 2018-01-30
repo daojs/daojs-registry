@@ -7,14 +7,17 @@ const {
   regexComponentName,
   isDaoComponent,
   parseVersion,
+  getCdnjsUrl,
 } = require('./url-utility');
 const { reportError } = require('../error');
 
 module.exports = function scripts({ registry, loaders = {} }) {
   function loadNpmScript({ component, version = 'latest', debug }) {
-    const url = `https://wzrd.in/${debug ? 'debug-' : ''}standalone/${component}@${version}`;
-
-    return rp.get(url);
+    const url = getCdnjsUrl({ component, version, debug });
+    if (url) {
+      return rp.get(url);
+    }
+    return Promise.resolve('No npm package defined in yaml');
   }
 
   function loadDaoScript({ component, version, debug }) {

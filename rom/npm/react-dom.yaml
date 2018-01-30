@@ -1,0 +1,5 @@
+latest: !!map
+  source: https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.2.0/umd/react-dom.production.min.js
+  debug: https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.2.0/umd/react-dom.development.js
+  dependencies: !!seq
+  - react
