@@ -7,7 +7,9 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const path = require('path');
 
-const url = 'http://localhost:3000';
+const baseUrl = 'http://localhost:3000';
+const uploadUrl = `${baseUrl}/components/`;
+const detailUrl = `${baseUrl}/public/#/detail/`;
 
 const { argv } = require('yargs')
   .option('path', { alias: 'p', default: './' })
@@ -78,10 +80,12 @@ function upload(directory, isRoot = false) {
           throw new Error('Component name must starts with @/');
         }
         rootName = name;
+        currentName = name;
+      } else {
+        currentName = `${rootName}/${path.relative(argv.path, directory)}`;
       }
-      currentName = rootName + path.relative(argv.path, directory);
 
-      return axios.post(`${url}/resources/${currentName}`, {
+      return axios.post(`${uploadUrl}${currentName}`, {
         source,
         readme,
         type,
@@ -102,31 +106,29 @@ function upload(directory, isRoot = false) {
       });
     })
     .then((response) => {
-      log.succ('Upload successfully, name =', currentName, ' version =', response.data.version);
-      log('View your component at', response.config.url.replace(`${url}/resources/`, `${url}/public/#/detail/`));
-      return 'success';
+      log.succ(`Upload ${currentName} successfully, version = ${response.data.version}`);
+      log(`    View your component at ${response.config.url.replace(uploadUrl, detailUrl)}`);
+      return { success: 1 };
     })
     .catch((error) => {
-      log.error(error);
+      log.error(`Upload ${currentName} failed, ${error}`);
       if (error.response) {
-        log.error('Response:', _.get(error, 'response.data.message', 'empty'));
+        log(`    message: ${_.get(error, 'response.data.message', 'empty')}`);
       }
-      return 'failed';
+      return { failed: 1 };
     });
 
   return Promise.props({ subTasks, currentTask })
     .then(result => result.subTasks.concat(result.currentTask))
-    .reduce((result, status) => _.defaults({
-      [status]: (result[status] || 0) + 1,
-    }, result), {
+    .reduce((sum, current) => _.defaults({
+      success: (current.success || 0) + sum.success,
+      failed: (current.failed || 0) + sum.failed,
+    }, sum), {
       success: 0,
       failed: 0,
     });
 }
 
 upload(argv.path, true).then((result) => {
-  log('Upload finished');
-  log('Total:', result.success + result.failed);
-  log('Success:', result.success);
-  log('Failed:', result.failed);
+  log(`Upload finished, taotal: ${result.success + result.failed}, success: ${result.success}, failed: ${result.failed}`);
 });
