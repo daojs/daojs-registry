@@ -1,9 +1,9 @@
 html
   head
-    script(src=daobase + 'resources/@/bootloader@latest/index.js')
-    script(src=daobase + 'resources/@/requirejs@latest/index.js')
+    script(src=daobase + 'scripts/@/bootloader.js')
+    script(src=daobase + 'scripts/@/requirejs.js')
     if resolve
-      script(src=daobase + 'api/resolve/' + component + '@' + version + '?callback=daojs.boot')
+      script(src=daobase + 'api/resolve/' + component + '?callback=daojs.boot')
     else
-      script(src=daobase + 'resources/' + component + '@' + version + '/index.js?callback=daojs.boot')
+      script(src=daobase + 'scripts/' + component + '.js?callback=daojs.boot')
   body

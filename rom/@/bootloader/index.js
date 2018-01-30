@@ -5,21 +5,15 @@ window.daojs = {
 
     for (var name in info.versions) {
       var ver = info.versions[name];
-      var match = name.match(/^npm\/(.*)$/);
-
-      paths[name] = name + '@' + ver + '/index';
-      if (match) {
-        npmMap[match[1]] = name;
-      }
+      paths[name] = name + '.js';
     }
 
     requirejs.config({
-      baseUrl: window.daojs.base + 'resources',
+      baseUrl: window.daojs.base + 'scripts',
       paths: paths,
-      map: { "npm": npmMap },
     });
 
     require([info.entry]);
   },
-  base: document.currentScript.src.replace(/resources\/@\/bootloader@.*/, ''),
+  base: document.currentScript.src.replace(/scripts\/@\/bootloader@.*/, ''),
 };

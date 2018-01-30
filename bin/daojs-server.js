@@ -29,7 +29,7 @@ express()
   .use(argv.daobase, daojs({
     storage: waterfallStorage({
       storages: [{
-        condition: '@/bootloader',
+        condition: node => _.includes(['@/bootloader', '@/requirejs'], node),
         storage: romStorage({
           root: path.resolve(__dirname, '../rom'),
         }),

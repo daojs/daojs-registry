@@ -4,8 +4,6 @@ const _ = require('lodash');
 module.exports = function view({
   urlUtility: {
     regexComponentName,
-    regexVersion,
-    parseVersion,
   },
   daobase,
 }) {
@@ -13,9 +11,9 @@ module.exports = function view({
 
   return express
     .Router()
-    .get(new RegExp(`^/${regexC}(?:@(${regexVersion}))?$`), (req, res) => {
+    .get(new RegExp(`^/${regexC}$`), (req, res) => {
       const component = req.params[0];
-      const version = parseVersion(req.params[1] || 'latest');
+      const version = req.query.v || 'latest';
 
       res.render('bootloader', {
         component,
