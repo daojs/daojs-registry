@@ -7,17 +7,21 @@
   "author": "Wei Wei <shazhouke@gmail.com>",
   "license": "MIT",
   "bin": {
-    "daojs-server": "./bin/daojs-server.js"
+    "daojs-server": "./bin/daojs-server.js",
+    "daojs-upload": "./bin/daojs-upload.js"
   },
   "dependencies": {
+    "axios": "^0.17.1",
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
+    "chalk": "^2.3.0",
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.8.0",
+    "esprima": "^4.0.0",
     "express": "^4.16.2",
     "forever": "^0.15.3",
     "fs-extra": "^5.0.0",
