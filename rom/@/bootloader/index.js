@@ -1,11 +1,12 @@
 window.daojs = {
   boot: function (info) {
+    console.log(info);
     var paths = {};
     var npmMap = {};
 
     for (var name in info.versions) {
       var ver = info.versions[name];
-      paths[name] = name + '.js';
+      paths[name] = name + '.js?v=' + ver;
     }
 
     requirejs.config({
@@ -15,5 +16,5 @@ window.daojs = {
 
     require([info.entry]);
   },
-  base: document.currentScript.src.replace(/scripts\/@\/bootloader@.*/, ''),
+  base: document.currentScript.src.replace(/scripts\/@\/bootloader.js/, ''),
 };
