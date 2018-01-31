@@ -1,19 +1,13 @@
-window.daojs = {
-  boot: function (info) {
-    var paths = {};
-    var npmMap = {};
+var component=document.currentScript.dataset.component;
+var version=document.currentScript.dataset.version;
 
-    for (var name in info.versions) {
-      var ver = info.versions[name];
-      paths[name] = name + '.js?v=' + ver;
+requirejs.config({
+  baseUrl: document.currentScript.src.replace(/\/@\/bootloader.js/, ''),
+  urlArgs: 'v=' + version,
+  map: {
+    '*': {
+      css: 'require-css',
     }
-
-    requirejs.config({
-      baseUrl: window.daojs.base + 'scripts',
-      paths: paths,
-    });
-
-    require([info.entry]);
-  },
-  base: document.currentScript.src.replace(/scripts\/@\/bootloader.js/, ''),
-};
+  }
+});
+require([component]);
