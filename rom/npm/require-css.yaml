@@ -1,0 +1,3 @@
+latest: !!map
+  source: https://cdnjs.cloudflare.com/ajax/libs/require-css/0.1.10/css.js
+  debug: https://cdnjs.cloudflare.com/ajax/libs/require-css/0.1.10/css.js
