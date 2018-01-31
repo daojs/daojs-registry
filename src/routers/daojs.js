@@ -5,7 +5,7 @@ const registry = require('../registry');
 const api = require('./api');
 
 const components = require('./components');
-const scripts = require('./scripts');
+const assets = require('./assets');
 const list = require('./list');
 
 function daojs({ storage, loaders }) {
@@ -18,7 +18,7 @@ function daojs({ storage, loaders }) {
     .Router()
     .use(bodyParser.json())
     .use('/components', components(options))
-    .use('/scripts', scripts(options))
+    .use('/assets', assets(options))
     .use('/list', list(options))
     .use('/api', api(options));
 }
