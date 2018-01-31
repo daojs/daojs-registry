@@ -1,6 +1,5 @@
 window.daojs = {
   boot: function (info) {
-    console.log(info);
     var paths = {};
     var npmMap = {};
 
