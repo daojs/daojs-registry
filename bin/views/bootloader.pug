@@ -5,5 +5,5 @@ html
     if resolve
       script(src=daobase + 'api/resolve/' + component + '?callback=daojs.boot')
     else
-      script(src=daobase + 'scripts/' + component + '.js?callback=daojs.boot')
+      script(src=daobase + 'scripts/' + component + '?callback=daojs.boot')
   body
