@@ -2,6 +2,7 @@
 const express = require('express');
 const path = require('path');
 const _ = require('lodash');
+const cors = require('cors');
 const {
   daojs,
   storages: { fsStorage, romStorage, waterfallStorage },
@@ -25,6 +26,7 @@ express()
     urlUtility,
     daobase: argv.daobase,
   }))
+  .use(cors())
   .use(argv.webbase, express.static(path.join(__dirname, argv.webfold)))
   .use(argv.daobase, daojs({
     storage: waterfallStorage({
