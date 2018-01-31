@@ -32,6 +32,7 @@ axios.interceptors.request.use((config) => {
 
 const isDirectory = source => fs.lstatAsync(source).then(stat => stat.isDirectory());
 const getDirectories = source => fs.readdirAsync(source)
+  .filter(name => name !== 'node_modules')
   .map(name => path.join(source, name))
   .filter(isDirectory);
 
@@ -40,8 +41,7 @@ let rootName;
 function upload(directory, isRoot = false) {
   let currentName;
 
-  // Recursively upload all sub directories
-  const subTasks = getDirectories(directory).map(upload);
+  log(`Read ${path.resolve(directory)}`);
 
   // Upload current directory
   const currentTask = Promise.props(_.mapValues({
@@ -52,7 +52,7 @@ function upload(directory, isRoot = false) {
     const encoding = 'utf8';
     const filePath = path.resolve(directory, fileName);
 
-    log.verbose('Read', fileType, 'from', filePath, 'with encoding', encoding);
+    log.verbose(`    Read ${fileType} from ${filePath} with encoding ${encoding}`);
     return fs.readFileAsync(filePath, encoding)
       .catch((error) => {
         if (fileType === 'metadata') {
@@ -82,7 +82,7 @@ function upload(directory, isRoot = false) {
         rootName = name;
         currentName = name;
       } else {
-        currentName = `${rootName}/${path.relative(argv.path, directory)}`;
+        currentName = `${rootName}/${path.relative(argv.path, directory).replace('\\', '/')}`;
       }
 
       return axios.post(`${uploadUrl}${currentName}`, {
@@ -94,7 +94,7 @@ function upload(directory, isRoot = false) {
           .filter(syntaxTreeNode => syntaxTreeNode.type === 'ImportDeclaration')
           .reduce((deps, importDeclaration) => {
             const importFrom = importDeclaration.source.value;
-            const defaultVersion = importFrom.startsWith('@/') ? '0' : '*';
+            const defaultVersion = importFrom.startsWith('@/') ? 0 : '*';
             return _.defaults({
               [importFrom]: _.has(dependencies, importFrom) ?
                 dependencies[importFrom] :
@@ -117,11 +117,21 @@ function upload(directory, isRoot = false) {
       return { failed: 1 };
     });
 
-  return Promise.props({ subTasks, currentTask })
-    .then(result => result.subTasks.concat(result.currentTask))
-    .reduce((sum, current) => _.defaults({
-      success: (current.success || 0) + sum.success,
-      failed: (current.failed || 0) + sum.failed,
+  // Recursively upload all sub directories
+  const subTasks = () => getDirectories(directory).map(subDir => upload(subDir, false));
+
+  return currentTask
+    .then(currentResult => Promise.props({
+      currentResult,
+      subResults: subTasks(),
+    }))
+    .then(({
+      currentResult,
+      subResults,
+    }) => subResults.concat(currentResult))
+    .reduce((sum, item) => _.defaults({
+      success: (item.success || 0) + sum.success,
+      failed: (item.failed || 0) + sum.failed,
     }, sum), {
       success: 0,
       failed: 0,
