@@ -8,6 +8,7 @@ const {
   isDaoComponent,
   parseVersion,
   getCdnjsUrl,
+  getCdnCssUrl,
 } = require('./url-utility');
 const { reportError } = require('../error');
 
@@ -33,6 +34,14 @@ module.exports = function scripts({ registry, loaders = {} }) {
         debug,
         dependencies,
       }));
+  }
+
+  function load3rdCss({ component, version = 'latest', debug }) {
+    const url = getCdnCssUrl({ component, version, debug });
+    if (url) {
+      return rp.get(url);
+    }
+    return Promise.resolve('No such css define in yaml');
   }
 
   function loadScript({ component, version, debug }) {
@@ -77,6 +86,23 @@ module.exports = function scripts({ registry, loaders = {} }) {
           res
             .set('Content-Type', mimeTypes.contentType('.js'))
             .send(script);
+        })
+        .catch(reportError(res));
+    })
+    .get(new RegExp(`^/(${regexComponentName}).css`), (req, res) => {
+      const component = req.params[0];
+
+      // only support load from url, will support css loader
+      loadVersion({ component, strVer: req.query.v })
+        .then(version => load3rdCss({
+          component,
+          version,
+          debug: _.has(req.query, 'debug'),
+        }))
+        .then((css) => {
+          res
+            .set('Content-Type', mimeTypes.contentType('text/css'))
+            .send(css);
         })
         .catch(reportError(res));
     });

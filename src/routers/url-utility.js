@@ -25,6 +25,18 @@ function getCdnjsUrl({ component, version = 'latest', debug }) {
   return _.get(doc, `${version}.${debug ? 'debug' : 'source'}`);
 }
 
+function getCdnCssUrl({ component, version = 'latest', debug }) {
+  const paths = component.split('/');
+  const yamlFile = path.join(__dirname, `../../rom/npm/${paths[0]}.yaml`);
+  if (!fs.existsSync(yamlFile)) {
+    return undefined;
+  }
+  paths.shift();
+  const doc = yaml.safeLoad(fs.readFileSync(yamlFile, 'utf8'));
+  const keyPath = paths.length > 0 ? `.${paths.join('.')}` : '';
+  return _.get(doc, `${version}.css${keyPath}.${debug ? 'debug' : 'source'}`);
+}
+
 module.exports = {
   regexComponentSeg,
   regexComponentName,
@@ -33,4 +45,5 @@ module.exports = {
   parseVersion,
   isDaoComponent,
   getCdnjsUrl,
+  getCdnCssUrl,
 };
