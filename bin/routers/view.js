@@ -19,7 +19,6 @@ module.exports = function view({
         component,
         version,
         daobase: daobase.replace(/\/?$/, '/'),
-        resolve: _.has(req.query, 'resolve'),
       });
     });
 };

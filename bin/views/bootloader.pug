@@ -1,9 +1,5 @@
 html
   head
-    script(src=daobase + 'scripts/@/bootloader.js')
     script(src=daobase + 'scripts/@/requirejs.js')
-    if resolve
-      script(src=daobase + 'api/resolve/' + component + '?callback=daojs.boot')
-    else
-      script(src=daobase + 'scripts/' + component + '?callback=daojs.boot')
   body
+    script(src=daobase + 'scripts/@/bootloader.js', data-component=component, data-version=version)
