@@ -4,7 +4,10 @@ const { transform } = require('babel-core');
 module.exports = function babelLoader(options = {
   ast: false,
   presets: ['env', 'react'],
-  plugins: ['transform-es2015-modules-amd'],
+  plugins: [
+    'transform-es2015-modules-amd',
+    'transform-class-properties',
+  ],
 }) {
   return (code, {
     component,
