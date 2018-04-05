@@ -31,7 +31,7 @@ express()
   .use(argv.daobase, daojs({
     storage: waterfallStorage({
       storages: [{
-        condition: node => _.includes(['@/bootloader', '@/requirejs'], node),
+        condition: node => _.includes(['@/bootloader', '@/requirejs', '@/cajon'], node),
         storage: romStorage({
           root: path.resolve(__dirname, '../rom'),
         }),
