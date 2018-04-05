@@ -7,6 +7,7 @@ module.exports = function babelLoader(options = {
   plugins: [
     'transform-es2015-modules-amd',
     'transform-class-properties',
+    'transform-object-rest-spread',
   ],
 }) {
   return (code, {
