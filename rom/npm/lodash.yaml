@@ -1,0 +1,3 @@
+latest: !!map
+  source: https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.min.js
+  debug: https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.js

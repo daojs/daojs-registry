@@ -1,0 +1,3 @@
+latest: !!map
+  source: https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.6.1/prop-types.min.js
+  debug: https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.6.1/prop-types.js
