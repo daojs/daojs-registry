@@ -9,7 +9,7 @@
   var paths = {
     antd: 'https://cdnjs.cloudflare.com/ajax/libs/antd/3.1.6/antd.min',
     'antd.css': 'https://cdnjs.cloudflare.com/ajax/libs/antd/3.4.3/antd.css',
-    echarts: 'https://cdnjs.cloudflare.com/ajax/libs/echarts/4.0.4/echarts.min',
+    echarts: 'https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.min',
     'echarts-wordcloud': 'https://cdn.jsdelivr.net/npm/echarts-wordcloud@1.1.3/dist/echarts-wordcloud.min',
     'element-resize-event': 'https://cdn.jsdelivr.net/npm/element-resize-event@2.0.9/index.min',
     lodash: 'https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.5/lodash.min',
