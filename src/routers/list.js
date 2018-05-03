@@ -1,5 +1,6 @@
 const express = require('express');
 const Promise = require('bluebird');
+const _ = require('lodash');
 const {
   regexDaoComponentName,
 } = require('./url-utility');
@@ -12,7 +13,11 @@ module.exports = function list({ registry }) {
 
       Promise.props({
         version: registry.getVersion(component).catch(() => undefined),
-        children: registry.getChildren(component),
+        children: registry.getChildren(component).map(child => registry
+          .getBlob(`${component}/${child}`, 'metadata')
+          .then(childMeta => _.pick(JSON.parse(childMeta), ['category']))
+          .then(childMeta => ({ name: child, ...childMeta }))
+          .catch(() => ({ name: child }))),
       })
         .then(info => res.jsonp(info))
         .catch(reportError(res));
