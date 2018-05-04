@@ -32,6 +32,8 @@
     },
     paths: paths,
     cajon: {
+      // Must use XHR to fetch non-AMD modules in order to wrap them before their executing
+      // For AMD modules, we prefer not using XHR
       useXhr: function (url, protocal, hostname, port) {
         return notAMD.reduce(function (memo, current) {
           return memo || (url.indexOf(paths[current]) > -1);
